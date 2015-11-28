@@ -70,9 +70,10 @@ public class Main {
 		BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.generalNoTranslucencyShadow;
 		BeautyEyeLNFHelper.launchBeautyEyeLNF();
 		UIManager.put("RootPane.setupButtonVisible", false);
+
+
 		final JFrame f = new JFrame("桌面搜索工具");
 
-		resultTable = new JTable(0, 3);// new JTable();
 		logger.setLevel(Contants.log_level);
 
 		final JPopupMenu popupMenu = new JPopupMenu();
@@ -111,23 +112,6 @@ public class Main {
 					e1.printStackTrace();
 				}
 
-			}
-		});
-		resultTable.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent evt) {
-				if (evt.isPopupTrigger()) {
-					int row = resultTable.rowAtPoint(evt.getPoint());
-					if (row >= 0) {
-						resultTable.setRowSelectionInterval(row, row);
-					}
-					/**
-					 * 修改菜单首条的名称
-					 */
-					selectedFile = (String) resultTable.getValueAt(row, 1);
-
-					// 弹出菜单
-					popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-				}
 			}
 		});
 
@@ -199,14 +183,8 @@ public class Main {
 					TableColumn column3 = resultTable.getColumnModel()
 							.getColumn(2);
 					column1.setPreferredWidth(150);
-					column1.setMaxWidth(150);
-					column1.setMinWidth(250);
-					column2.setPreferredWidth(400);
-					column2.setMaxWidth(350);
-					column2.setMinWidth(250);
-					column3.setPreferredWidth(200);
-					column3.setMaxWidth(200);
-					column3.setMinWidth(250);
+					column2.setPreferredWidth(200);
+					column3.setPreferredWidth(400);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -245,7 +223,13 @@ public class Main {
 		northPanel.add(createBtn);
 		northPanel.add(settingBtn);
 
+
 		f.add(northPanel, BorderLayout.NORTH);
+//
+//		sourthPanel = new JPanel();
+//		sourthPanel.setLayout(new BorderLayout());
+//		sourthPanel.add(new JScrollPane(resultTxt), BorderLayout.CENTER);
+//		f.add(sourthPanel, BorderLayout.SOUTH);
 
 		settingBtn.addActionListener(new ActionListener() {
 
@@ -295,7 +279,7 @@ public class Main {
 
 				message[2] = datadirList;
 
-				String[] options = { "关闭" };
+				String[] options = {"关闭"};
 				pane.showOptionDialog(null, message, "配置扫描目录",
 						JOptionPane.DEFAULT_OPTION,
 						JOptionPane.INFORMATION_MESSAGE, null, options,
@@ -303,31 +287,9 @@ public class Main {
 			}
 		});
 
-		TableColumn column1 = resultTable.getColumnModel().getColumn(0);
-		TableColumn column2 = resultTable.getColumnModel().getColumn(1);
-		TableColumn column3 = resultTable.getColumnModel().getColumn(2);
-		column1.setPreferredWidth(150);
-		column1.setMaxWidth(150);
-		column1.setMinWidth(250);
-		column2.setPreferredWidth(400);
-		column2.setMaxWidth(350);
-		column2.setMinWidth(250);
-		column3.setPreferredWidth(200);
-		column3.setMaxWidth(200);
-		column3.setMinWidth(250);
-		resultTable.setSize(680, 500);
-		centerPanel = new JScrollPane();
-		centerPanel.setSize(700, 510);
-		centerPanel.add(resultTable);
-		// 分别设置水平和垂直滚动条总是出现
-		centerPanel
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		centerPanel
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		drawTable(f, popupMenu);
 
-		f.add(centerPanel, BorderLayout.CENTER);
-
-		f.setSize(800, 600);
+		f.setSize(1024, 768);
 		int width = Toolkit.getDefaultToolkit().getScreenSize().width;
 		int height = Toolkit.getDefaultToolkit().getScreenSize().height;
 
@@ -335,7 +297,7 @@ public class Main {
 		int top = (height - f.getSize().height) / 2;
 		f.setLocation(left, top);
 		f.setVisible(true);
-		f.setResizable(false);
+        f.setResizable(false);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		String value = PropertiesUtil.getValue("datadir");
@@ -343,5 +305,39 @@ public class Main {
 			searchBtn.setEnabled(false);
 			searchText.setText("您是首次运行，请点击设置按钮，配置要扫描的目录,并点击扫描按钮，建立索引");
 		}
+	}
+	private void drawTable(JFrame f ,final JPopupMenu popupMenu) {
+		resultTable = new JTable(0, 3);
+		resultTable.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent evt) {
+				if (evt.isPopupTrigger()) {
+					int row = resultTable.rowAtPoint(evt.getPoint());
+					if (row >= 0) {
+						resultTable.setRowSelectionInterval(row, row);
+					}
+					/**
+					 * 修改菜单首条的名称
+					 */
+					selectedFile = (String) resultTable.getValueAt(row, 1);
+
+					// 弹出菜单
+					popupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+				}
+			}
+		});
+
+		TableColumn column1 = resultTable.getColumnModel().getColumn(0);
+		TableColumn column2 = resultTable.getColumnModel().getColumn(1);
+		TableColumn column3 = resultTable.getColumnModel().getColumn(2);
+
+		column1.setPreferredWidth(150);
+		column2.setPreferredWidth(400);
+		column3.setPreferredWidth(150);
+
+		resultTable.setSize(700, 350);
+		centerPanel = new JScrollPane(resultTable);
+		f.add(centerPanel, BorderLayout.CENTER);
+
+
 	}
 }

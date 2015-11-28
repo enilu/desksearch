@@ -61,7 +61,8 @@ public class TextIndexCreator {
 			this.createIndex(new File(dataDir));
 
 		}
-		indexWriter.optimize();
+		//压缩
+//		indexWriter.optimize();
 		indexWriter.close();
 	}
 
@@ -75,6 +76,9 @@ public class TextIndexCreator {
 
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
+			if(files==null||files.length==0){
+			 return ;
+			}
 			for (File child : files) {
 				createIndex(child);
 			}
@@ -104,9 +108,14 @@ public class TextIndexCreator {
 						Field.Index.ANALYZED));
 				doc.add(new Field("filepath", file.getAbsolutePath(),
 						Field.Store.YES, Field.Index.NOT_ANALYZED));
-				doc.add(new Field("content", IOUtils.toString(
-						new FileInputStream(file), "UTF-8"), Field.Store.NO,
-						Field.Index.ANALYZED));
+				try {
+					doc.add(new Field("content", IOUtils.toString(
+							new FileInputStream(file), "UTF-8"), Field.Store.NO,
+							Field.Index.ANALYZED));
+				}catch (Exception e){
+					logger.info("读取失败");
+
+				}
 				doc.add(new NumericField("inputdate", Field.Store.YES, true)
 						.setLongValue(id));
 
@@ -118,8 +127,13 @@ public class TextIndexCreator {
 						Field.Index.ANALYZED));
 				doc.add(new Field("filepath", file.getAbsolutePath(),
 						Field.Store.YES, Field.Index.NOT_ANALYZED));
+				try {
 				doc.add(new Field("content", file.getName(), Field.Store.YES,
 						Field.Index.ANALYZED));
+				}catch (Exception e){
+					logger.info("读取失败");
+
+				}
 				doc.add(new NumericField("inputdate", Field.Store.YES, true)
 						.setLongValue(id));
 			}
